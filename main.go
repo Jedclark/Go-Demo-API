@@ -24,7 +24,11 @@ var users = map[string]models.User{}
 // var users = []models.User{}
 
 func getAllUsers(c *gin.Context) {
-	c.IndentedJSON(http.StatusOK, users)
+	response := make([]models.User, 0, len(users))
+	for _, value := range users {
+		response = append(response, value)
+	}
+	c.IndentedJSON(http.StatusOK, response)
 }
 
 func getUserById(c *gin.Context) {
@@ -56,6 +60,13 @@ func postUser(c *gin.Context) {
 	c.IndentedJSON(http.StatusBadRequest, gin.H{"message": "Invalid username or password"})
 }
 
+func patchUser(c *gin.Context) {
+	id := c.Param("id")
+	body := c.Request.Body
+	fmt.Printf("Body: %v\n", body)
+	fmt.Printf("Id: %v\n", id)
+}
+
 func deleteUser(c *gin.Context) {
 	id := c.Param("id")
 	user := users[id]
@@ -73,6 +84,7 @@ func main() {
 	router.GET("/users", getAllUsers)
 	router.GET("/users/:id", getUserById)
 	router.POST("/users", postUser)
+	router.PATCH("/users/:id", patchUser)
 	router.DELETE("/users/:id", deleteUser)
 	router.Run(":8080")
 }
